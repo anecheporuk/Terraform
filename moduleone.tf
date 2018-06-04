@@ -23,7 +23,26 @@ provider "aws" {
 # RESOURCES
 ##################################################################################
 
-resource "aws_instance" "nginx" {
+resource "aws_instance" "nat_instance" {
+  ami           = "ami-6a003c0f"
+  instance_type = "t2.micro"
+  key_name      = "${var.key_name}"
+  source_dest_check = "false"
+
+  connection {
+    user        = "ubuntu"
+    private_key = "${file(var.private_key_path)}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get install nginx -y",
+      "sudo service nginx start"
+    ]
+  }
+}
+
+resource "aws_instance" "simple_instance" {
   ami           = "ami-6a003c0f"
   instance_type = "t2.micro"
   key_name      = "${var.key_name}"
@@ -46,5 +65,5 @@ resource "aws_instance" "nginx" {
 ##################################################################################
 
 output "aws_instance_public_dns" {
-    value = "${aws_instance.nginx.public_dns}"
+    value = "${aws_instance.nat_instance.public_dns}"
 }
