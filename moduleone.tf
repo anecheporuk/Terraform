@@ -151,7 +151,7 @@ resource "aws_route_table" "public-a" {
   vpc_id     = "${aws_vpc.terraform_vpc.id}"
   route {
     cidr_block = "0.0.0.0/0"
-    instance_id = "${aws_internet_gateway.terraformIGW.id}"
+    gateway_id = "${aws_internet_gateway.terraformIGW.id}"
   }
   tags {
     Name = "terraform_public-a"
