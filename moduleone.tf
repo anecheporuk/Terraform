@@ -62,6 +62,9 @@ resource "aws_instance" "simple_instance" {
     user        = "ec2-user"
     private_key = "${file(var.private_key_path)}"
   }
+  tags {
+    Name = "second_instance"
+  }
 }
 
 resource "aws_security_group" "terraform_SG" {
@@ -190,5 +193,12 @@ resource "aws_route_table_association" "private-a" {
 
 output "aws_instance_public_dns" {
     value = "${aws_instance.nat_instance.public_dns}"
+}
+
+output "Nat instance public IP " {
     value = "${aws_instance.nat_instance.public_ip}"
+}
+
+output "Simple instance private IP " {
+    value = "${aws_instance.simple_instance.private_ip}"
 }
