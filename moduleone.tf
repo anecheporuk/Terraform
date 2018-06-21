@@ -5,19 +5,21 @@
 variable "aws_access_key" {}
 variable "aws_secret_key" {}
 variable "private_key_path" {}
+
 variable "key_name" {
   default = "anecheporuk-air"
 }
+
 variable "availability-zones" {
   default = [
     "us-east-2a",
     "us-east-2b",
     "us-east-2c",
-    "us-east-2e"
+    "us-east-2e",
   ]
+
   type = "list"
 }
-
 
 ##################################################################################
 # PROVIDERS
@@ -34,42 +36,44 @@ provider "aws" {
 ##################################################################################
 
 resource "aws_instance" "nat_instance" {
-  ami                     = "ami-021e3167"
-  instance_type           = "t2.micro"
-  key_name                = "${var.key_name}"
-  source_dest_check       = "false"
-  vpc_security_group_ids  = ["${aws_security_group.terraform_SG.id}"]
-  subnet_id               = "${aws_subnet.public-a.id}"
+  ami                    = "ami-021e3167"
+  instance_type          = "t2.micro"
+  key_name               = "${var.key_name}"
+  source_dest_check      = "false"
+  vpc_security_group_ids = ["${aws_security_group.terraform_SG.id}"]
+  subnet_id              = "${aws_subnet.public-a.id}"
+  user_data              = "${file("jenkins_userdata.sh")}"
 
   connection {
     user        = "ec2-user"
     private_key = "${file(var.private_key_path)}"
   }
-  
+
   tags {
     Name = "nat_instance"
   }
 }
 
 resource "aws_instance" "simple_instance" {
-  ami                     = "ami-922914f7"
-  instance_type           = "t2.micro"
-  key_name                = "${var.key_name}"
-  vpc_security_group_ids  = ["${aws_security_group.terraform_SG.id}"]
-  subnet_id               = "${aws_subnet.private-a.id}"
+  ami                    = "ami-922914f7"
+  instance_type          = "t2.micro"
+  key_name               = "${var.key_name}"
+  vpc_security_group_ids = ["${aws_security_group.terraform_SG.id}"]
+  subnet_id              = "${aws_subnet.private-a.id}"
 
   connection {
     user        = "ec2-user"
     private_key = "${file(var.private_key_path)}"
   }
+
   tags {
     Name = "second_instance"
   }
 }
 
 resource "aws_security_group" "terraform_SG" {
-  name          = "terraform security group"
-  vpc_id        = "${aws_vpc.terraform_vpc.id}"
+  name   = "terraform security group"
+  vpc_id = "${aws_vpc.terraform_vpc.id}"
 
   ingress {
     from_port   = 0
@@ -77,12 +81,21 @@ resource "aws_security_group" "terraform_SG" {
     protocol    = "-1"
     cidr_blocks = ["10.0.0.0/26"]
   }
+
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["188.163.232.130/32"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -92,29 +105,29 @@ resource "aws_security_group" "terraform_SG" {
 }
 
 resource "aws_internet_gateway" "terraformIGW" {
-  
   vpc_id = "${aws_vpc.terraform_vpc.id}"
-  
+
   tags {
     Name = "terraformIGW"
   }
-  
 }
 
 resource "aws_vpc" "terraform_vpc" {
   cidr_block = "10.0.0.0/26"
-  
+
   tags {
     Name = "terraform_vpc"
   }
 }
 
 resource "aws_subnet" "public-a" {
-  vpc_id     = "${aws_vpc.terraform_vpc.id}"
-  cidr_block = "10.0.0.32/28"
+  vpc_id                  = "${aws_vpc.terraform_vpc.id}"
+  cidr_block              = "10.0.0.32/28"
   map_public_ip_on_launch = "true"
-#  availability_zone = "${var.availability-zones[count.index]}"
+
+  #  availability_zone = "${var.availability-zones[count.index]}"
   availability_zone = "us-east-2a"
+
   tags {
     Name = "Public-a"
   }
@@ -130,10 +143,11 @@ resource "aws_subnet" "public-a" {
 #}
 
 resource "aws_subnet" "private-a" {
-  vpc_id     = "${aws_vpc.terraform_vpc.id}"
-  cidr_block = "10.0.0.0/28"
+  vpc_id                  = "${aws_vpc.terraform_vpc.id}"
+  cidr_block              = "10.0.0.0/28"
   map_public_ip_on_launch = "false"
- # availability_zone = "${var.availability-zones[count.index]}"
+
+  # availability_zone = "${var.availability-zones[count.index]}"
   availability_zone = "us-east-2a"
 
   tags {
@@ -151,40 +165,41 @@ resource "aws_subnet" "private-a" {
 #}
 
 resource "aws_route_table" "public-a" {
-  vpc_id     = "${aws_vpc.terraform_vpc.id}"
+  vpc_id = "${aws_vpc.terraform_vpc.id}"
+
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = "${aws_internet_gateway.terraformIGW.id}"
   }
+
   tags {
     Name = "terraform_public-a"
   }
-  
 }
 
 resource "aws_route_table" "private-a" {
-  vpc_id     = "${aws_vpc.terraform_vpc.id}"
+  vpc_id = "${aws_vpc.terraform_vpc.id}"
+
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block  = "0.0.0.0/0"
     instance_id = "${aws_instance.nat_instance.id}"
+
     #network_interface_id = "${aws_instance.nat_instance.network_interface_id}"
   }
-  
+
   tags {
     Name = "terraform_private-a"
   }
-    
 }
 
 resource "aws_route_table_association" "public-a" {
-  subnet_id = "${aws_subnet.public-a.id}"
+  subnet_id      = "${aws_subnet.public-a.id}"
   route_table_id = "${aws_route_table.public-a.id}"
 }
 
 resource "aws_route_table_association" "private-a" {
-  subnet_id = "${aws_subnet.private-a.id}"
+  subnet_id      = "${aws_subnet.private-a.id}"
   route_table_id = "${aws_route_table.private-a.id}"
-  
 }
 
 ##################################################################################
@@ -192,13 +207,13 @@ resource "aws_route_table_association" "private-a" {
 ##################################################################################
 
 output "aws_instance_public_dns" {
-    value = "${aws_instance.nat_instance.public_dns}"
+  value = "${aws_instance.nat_instance.public_dns}"
 }
 
 output "Nat instance public IP " {
-    value = "${aws_instance.nat_instance.public_ip}"
+  value = "${aws_instance.nat_instance.public_ip}"
 }
 
 output "Simple instance private IP " {
-    value = "${aws_instance.simple_instance.private_ip}"
+  value = "${aws_instance.simple_instance.private_ip}"
 }
