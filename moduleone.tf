@@ -96,6 +96,13 @@ resource "aws_security_group" "terraform_SG" {
     cidr_blocks = ["188.163.232.130/32"]
   }
 
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["37.115.191.123/32"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
