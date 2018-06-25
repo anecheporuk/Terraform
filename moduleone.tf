@@ -213,9 +213,9 @@ resource "aws_route_table_association" "private-a" {
 # OUTPUT
 ##################################################################################
 
-output "aws_instance_public_dns" {
-  value = "${aws_instance.nat_instance.public_dns}"
-}
+#output "aws_instance_public_dns" {
+#  value = "${aws_instance.nat_instance.public_dns}"
+#}
 
 output "Nat instance public IP " {
   value = "${aws_instance.nat_instance.public_ip}"
