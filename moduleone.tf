@@ -60,6 +60,7 @@ resource "aws_instance" "simple_instance" {
   key_name               = "${var.key_name}"
   vpc_security_group_ids = ["${aws_security_group.terraform_SG.id}"]
   subnet_id              = "${aws_subnet.private-a.id}"
+  user_data              = "${file("tomcat_userdata.sh")}"
 
   connection {
     user        = "ec2-user"
