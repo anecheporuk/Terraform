@@ -55,7 +55,7 @@ resource "aws_instance" "nat_instance" {
 }
 
 resource "aws_instance" "simple_instance" {
-  ami                    = "ami-922914f7"
+  ami                    = "ami-03291866"
   instance_type          = "t2.micro"
   key_name               = "${var.key_name}"
   vpc_security_group_ids = ["${aws_security_group.terraform_SG.id}"]
