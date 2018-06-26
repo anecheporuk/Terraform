@@ -9,10 +9,10 @@
 # or in the "license" file accompanying this file. This file is distributed on an "AS IS"
 # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations under the License.
-
+easy_install pip
 pip install ansible
 yum install git java-1.8.0-openjdk git -y
-yum remove java-1.7.0-openjdk -y
+#yum remove java-1.7.0-openjdk -y
 cd /opt
 git clone https://github.com/anecheporuk/jenkins-userdata-ansible.git
-/usr/local/bin/ansible-playbook -i /opt/jenkins-userdata-ansible/hosts /opt/jenkins-userdata-ansible/playbook_tomcat.yml
+/usr/bin/ansible-playbook -i /opt/jenkins-userdata-ansible/hosts /opt/jenkins-userdata-ansible/playbook_tomcat.yml
