@@ -54,24 +54,6 @@ resource "aws_instance" "nat_instance" {
   }
 }
 
-resource "aws_instance" "zabbix_instance" {
-  ami                    = "ami-5e8bb23b"
-  instance_type          = "t2.micro"
-  key_name               = "${var.key_name}"
-  source_dest_check      = "false"
-  vpc_security_group_ids = ["${aws_security_group.terraform_SG.id}"]
-  subnet_id              = "${aws_subnet.public-a.id}"
-
-  connection {
-    user        = "ubuntu"
-    private_key = "${file(var.private_key_path)}"
-  }
-
-  tags {
-    Name = "zabbix-server"
-  }
-}
-
 resource "aws_instance" "simple_instance" {
   ami                    = "ami-2a0f324f"
   instance_type          = "t2.micro"
@@ -238,10 +220,6 @@ resource "aws_route_table_association" "private-a" {
 
 output "Nat instance public IP " {
   value = "${aws_instance.nat_instance.public_ip}"
-}
-
-output "Zabbix instance public IP " {
-  value = "${aws_instance.zabbix_instance.public_ip}"
 }
 
 output "Simple instance private IP " {
