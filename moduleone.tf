@@ -240,7 +240,7 @@ output "Nat instance public IP " {
   value = "${aws_instance.nat_instance.public_ip}"
 }
 
-output "Nat instance public IP " {
+output "Zabbix instance public IP " {
   value = "${aws_instance.zabbix_instance.public_ip}"
 }
 
