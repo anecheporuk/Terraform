@@ -55,21 +55,20 @@ resource "aws_instance" "nat_instance" {
 }
 
 resource "aws_instance" "zabbix_instance" {
-  ami                    = "ami-03291866"
+  ami                    = "ami-5e8bb23b"
   instance_type          = "t2.micro"
   key_name               = "${var.key_name}"
   source_dest_check      = "false"
   vpc_security_group_ids = ["${aws_security_group.terraform_SG.id}"]
   subnet_id              = "${aws_subnet.public-a.id}"
-  user_data              = "${file("jenkins_userdata.sh")}"
 
   connection {
-    user        = "ec2-user"
+    user        = "ubuntu"
     private_key = "${file(var.private_key_path)}"
   }
 
   tags {
-    Name = "nat_instance"
+    Name = "zabbix-server"
   }
 }
 
@@ -239,6 +238,10 @@ resource "aws_route_table_association" "private-a" {
 
 output "Nat instance public IP " {
   value = "${aws_instance.nat_instance.public_ip}"
+}
+
+output "Nat instance public IP " {
+  value = "${aws_instance.zabbix_instance.public_ip}"
 }
 
 output "Simple instance private IP " {
