@@ -1,0 +1,31 @@
+{
+ "sku": {
+  "name": "A0",
+  "tier": "Free"
+ },
+ "properties": {
+  "displayName": "Deny NSG rules with inbound ports from the internet",
+  "policyDefinitionId": "/subscriptions/0a8bd5cf-c5d1-4550-8b29-510ef2fe658b/providers/Microsoft.Authorization/policyDefinitions/69207ba4-b238-426a-ba81-7651c3c7736a",
+  "scope": "/subscriptions/0a8bd5cf-c5d1-4550-8b29-510ef2fe658b",
+  "notScopes": [],
+  "parameters": {
+   "deniedPorts": {
+    "value": [
+     "1433"
+    ]
+   }
+  },
+  "metadata": {
+   "assignedBy": "Andrii Necheporuk",
+   "parameterScopes": {},
+   "createdBy": "5a510a08-0c48-460b-b1df-c8935ad7c9f5",
+   "createdOn": "2021-01-15T13:43:28.171064Z",
+   "updatedBy": null,
+   "updatedOn": null
+  },
+  "enforcementMode": "Default"
+ },
+ "id": "/subscriptions/0a8bd5cf-c5d1-4550-8b29-510ef2fe658b/providers/Microsoft.Authorization/policyAssignments/4b01a172d9e84f46bd97891a",
+ "type": "Microsoft.Authorization/policyAssignments",
+ "name": "4b01a172d9e84f46bd97891a"
+}

@@ -1,0 +1,76 @@
+{
+ "properties": {
+  "displayName": "Deny NSG rules with inbound ports from the internet",
+  "policyType": "Custom",
+  "mode": "All",
+  "metadata": {
+   "category": "Network security",
+   "createdBy": "5a510a08-0c48-460b-b1df-c8935ad7c9f5",
+   "createdOn": "2021-01-15T13:41:12.7434818Z",
+   "updatedBy": null,
+   "updatedOn": null
+  },
+  "parameters": {
+   "deniedPorts": {
+    "type": "Array",
+    "metadata": {
+     "displayName": "Ports to block",
+     "description": "The inbound ports that should be blocked"
+    }
+   }
+  },
+  "policyRule": {
+   "if": {
+    "allOf": [
+     {
+      "field": "type",
+      "equals": "Microsoft.Network/networkSecurityGroups/securityRules"
+     },
+     {
+      "allOf": [
+       {
+        "field": "Microsoft.Network/networkSecurityGroups/securityRules/access",
+        "equals": "Allow"
+       },
+       {
+        "field": "Microsoft.Network/networkSecurityGroups/securityRules/direction",
+        "equals": "Inbound"
+       },
+       {
+        "anyOf": [
+         {
+          "field": "Microsoft.Network/networkSecurityGroups/securityRules/destinationPortRange",
+          "in": "[parameters('deniedPorts')]"
+         },
+         {
+          "not": {
+           "field": "Microsoft.Network/networkSecurityGroups/securityRules/destinationPortRanges[*]",
+           "notIn": "[parameters('deniedPorts')]"
+          }
+         }
+        ]
+       },
+       {
+        "anyOf": [
+         {
+          "field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefix",
+          "in": [
+           "*",
+           "Internet"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "then": {
+    "effect": "deny"
+   }
+  }
+ },
+ "id": "/subscriptions/0a8bd5cf-c5d1-4550-8b29-510ef2fe658b/providers/Microsoft.Authorization/policyDefinitions/69207ba4-b238-426a-ba81-7651c3c7736a",
+ "type": "Microsoft.Authorization/policyDefinitions",
+ "name": "69207ba4-b238-426a-ba81-7651c3c7736a"
+}
